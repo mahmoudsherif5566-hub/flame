@@ -1,0 +1,1 @@
+{"description":"Flame — standalone ad creative studio with a real central database (Supabase in production, local SQLite for development).","engines":{"node":">=22"},"name":"flame-standalone","scripts":{"dev":"node server.js","start":"node server.js"},"type":"module","version":"1.0.0"}
