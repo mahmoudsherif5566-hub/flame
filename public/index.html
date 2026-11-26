@@ -163,7 +163,7 @@
       </div>
     </div>
   </section>
-  <p class="note">Flame المستقل — قاعدة البيانات مركزية على السيرفر. توليد الصور بالذكاء الاصطناعي مجاني وبدون مفتاح (Pollinations)، وقصّ خلفية الصور بنموذج ذكاء اصطناعي يشتغل في متصفحك — أول مرة بينزّل حوالي 90MB وبيتخزّن بعدها، وصورتك مش بتتبعت لأي سيرفر.</p>
+  <p class="note">Flame المستقل — قاعدة البيانات مركزية على السيرفر. توليد الصور بالذكاء الاصطناعي: الأساسي Cloudflare Workers AI (FLUX) عن طريق السيرفر، والاحتياطي Pollinations المجاني لو الأساسي مش متوصّل أو مشغول — وقصّ خلفية الصور بنموذج ذكاء اصطناعي يشتغل في متصفحك — أول مرة بينزّل حوالي 90MB وبيتخزّن بعدها، وصورتك مش بتتبعت لأي سيرفر.</p>
 </main>
 <div class="toast" id="toast"></div>
 <script>
@@ -373,7 +373,19 @@ function cleanCutout(img){
   x.putImageData(id,0,0);
   return c;
 }
-/* Fetch a real AI image, retrying with backoff when the free tier is at its limit (402/503).
+/* Primary generator: our own server endpoint (Cloudflare Workers AI, FLUX).
+   The Cloudflare token stays on the server and never reaches the browser.
+   503 (not configured) or any failure -> null, and the caller falls back
+   to Pollinations below. Returns an <img> or null. */
+async function fetchAIImageServer(prompt,w,h,seed){
+  try{
+    const resp=await fetch('/api/generate-image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,width:w,height:h,seed})});
+    if(!resp.ok)return null;
+    return await loadImage(URL.createObjectURL(await resp.blob()));
+  }catch(e){return null}
+}
+/* Fallback generator: real AI image (Pollinations, free, no key), retrying
+   with backoff when the free tier is at its limit (402/503).
    AI-only: if it still fails, the caller must show an honest failure — never a fake image. */
 async function fetchAIImage(url){
   for(let attempt=0;attempt<3;attempt++){
@@ -400,12 +412,14 @@ $('genBtn').onclick=async()=>{
     }
     setStatus('🎨 الذكاء الاصطناعي بيرسم الإعلان… (ممكن ياخد 20-40 ثانية)');
     const prompt=cutout?adPrompt(name,desc,true):adPrompt(name,desc,false);
-    // Real AI image (Pollinations, free, no key) — retries when the free tier is busy.
-    // AI-only: if it still fails, say so honestly. No gradient/fake ad is ever served.
-    const aiImg=await fetchAIImage(pollinationsURL(prompt,w,h,seed));
+    // Primary: Cloudflare Workers AI via our server (token stays server-side).
+    // Fallback: Pollinations direct, with its own retries when busy.
+    // AI-only: if both fail, say so honestly. No gradient/fake ad is ever served.
+    let aiImg=await fetchAIImageServer(prompt,w,h,seed);
+    if(!aiImg){setStatus('🎨 الأساسي مش متاح دلوقتي — الاحتياطي المجاني بيرسم الإعلان…');aiImg=await fetchAIImage(pollinationsURL(prompt,w,h,seed))}
     if(!aiImg){
-      setStatus('❌ الخدمة مشغولة دلوقتي — استنى شوية وجرّب تاني');
-      $('result').innerHTML=`<p>⚠️ خدمة التوليد المجانية مشغولة دلوقتي (صورة كل 45 ثانية لنفس الشبكة) — جرّبنا 3 مرات وما قدرناش نولّد صورة. مفيش إعلان هنا، ودي مش مشكلة في بياناتك:</p><p class="note">استنى دقيقة وجرّب تاني. لو المشكلة مستمرة، جرّب وقت تاني — الخدمة المجانية بتتضغط أحياناً.</p><button class="ghost" style="width:auto;display:inline-block" onclick="document.getElementById('genBtn').click()">🔄 حاول تاني</button>`;
+      setStatus('❌ خدمة التوليد مشغولة دلوقتي — استنى شوية وجرّب تاني');
+      $('result').innerHTML=`<p>⚠️ خدمة التوليد مشغولة دلوقتي — جرّبنا Cloudflare وبعدها الاحتياطي المجاني (صورة كل 45 ثانية لنفس الشبكة) وما قدرناش نولّد صورة. مفيش إعلان هنا، ودي مش مشكلة في بياناتك:</p><p class="note">استنى دقيقة وجرّب تاني. لو المشكلة مستمرة، جرّب وقت تاني — الخدمة المجانية بتتضغط أحياناً.</p><button class="ghost" style="width:auto;display:inline-block" onclick="document.getElementById('genBtn').click()">🔄 حاول تاني</button>`;
       toast('الخدمة مشغولة — جرّب تاني بعد شوية');
       btn.disabled=false;return;
     }
