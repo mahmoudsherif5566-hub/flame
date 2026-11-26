@@ -1,0 +1,15 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+# Frontend calls /api/* — rewrite to the Netlify Functions (URL stays /api/*).
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Same as server.js: unknown paths serve the app (index.html).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
