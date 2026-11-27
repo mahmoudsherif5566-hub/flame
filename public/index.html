@@ -178,9 +178,14 @@ const samples=[
  {src:'assets/sample-coffee.jpg',name:'قهوة مختصة'}];
 let idx=0, email=localStorage.getItem('flame_email')||'';
 const track=$('track');
-samples.forEach((s,i)=>{const d=document.createElement('div');d.className='slide';d.innerHTML=`<img src="${s.src}" alt="" aria-label="${s.name}">`;d.onclick=()=>{$('productName').value=s.name;toast('اتملت بيانات النموذج في الاستوديو');document.getElementById('studioBox').scrollIntoView({behavior:'smooth'})};track.appendChild(d);
+samples.forEach((s,i)=>{const d=document.createElement('div');d.className='slide';d.innerHTML=i===0?`<img src="${s.src}" alt="" aria-label="${s.name}">`:`<img data-src="${s.src}" alt="" aria-label="${s.name}">`;d.onclick=()=>{$('productName').value=s.name;toast('اتملت بيانات النموذج في الاستوديو');document.getElementById('studioBox').scrollIntoView({behavior:'smooth'})};track.appendChild(d);
  const dot=document.createElement('span');dot.onclick=()=>go(i);$('dots').appendChild(dot);});
-function go(i){idx=(i+samples.length)%samples.length;track.style.transform=`translateX(${idx*100}%)`;$('counter').textContent=`${idx+1} / ${samples.length}`;[...$('dots').children].forEach((d,j)=>d.classList.toggle('on',j===idx))}
+// Lazy-load slider images: only the first slide loads on page open; a slide's
+// image loads when it becomes active, and the next slide is preloaded on
+// navigation so swiping still feels instant.
+function loadSlide(i){const img=track.children[i]&&track.children[i].querySelector('img');if(img&&!img.getAttribute('src')&&img.dataset.src)img.src=img.dataset.src}
+let firstGo=true;
+function go(i){idx=(i+samples.length)%samples.length;loadSlide(idx);if(!firstGo)loadSlide((idx+1)%samples.length);firstGo=false;track.style.transform=`translateX(${idx*100}%)`;$('counter').textContent=`${idx+1} / ${samples.length}`;[...$('dots').children].forEach((d,j)=>d.classList.toggle('on',j===idx))}
 $('prev').onclick=()=>go(idx-1);$('next').onclick=()=>go(idx+1);go(0);
 
 /* ---------- choices ---------- */
