@@ -1,0 +1,8 @@
+# Flame on Cloudflare Pages — static frontend (public/) + Pages Functions (functions/).
+# Deploy: npx wrangler pages deploy public --project-name flame
+# Local dev: npx wrangler pages dev public  (reads .dev.vars for env vars)
+name = "flame"
+pages_build_output_dir = "public"
+compatibility_date = "2026-11-27"
+# No compatibility_flags: the Functions use only Web-standard APIs
+# (fetch, atob, Intl, Response), no Node-only APIs, so nodejs_compat is not needed.

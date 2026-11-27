@@ -295,15 +295,18 @@ function drawAdText(ctx,W,H,layout){
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
 /* Clean an AI cutout's alpha mask before compositing:
-   1) strict alpha contrast, with the window adapted to the mask itself
-      (confident masks get a strict window; weaker masks get a gentler one)
-      — semi-transparent background bleed (e.g. clothes touching the
-      product, patterned remnants) is pushed to 0, the solid product stays;
+   1) gentle alpha contrast, with the window adapted to the mask itself
+      (confident masks get a slightly stricter window; weaker masks get a
+      gentler one) — true background (near-zero alpha) is pushed to 0,
+      while mid-alpha product pixels survive partially instead of being
+      erased, so dark clothes are never eaten away;
    2) hue veto — pixels whose colour hue is far from the product's own
       dominant hue (e.g. a purple garment touching a maroon shirt) are
       dropped; skipped when the product itself is near-grey;
-   3) fill enclosed holes, keep only the largest connected component,
-      dropping small disconnected fragments; 4) feather the edge. */
+   3) fill enclosed holes, keep the largest connected component plus any
+      other component that is large (≥8% of the largest) or close to it
+      (within 3 cells), so a sleeve split off by a low-alpha gap survives,
+      while small far-away fragments are still dropped; 4) feather the edge. */
 function cleanCutout(img){
   const w=img.width,h=img.height;
   const c=document.createElement('canvas');c.width=w;c.height=h;
@@ -312,7 +315,7 @@ function cleanCutout(img){
   // percentile of alpha, to adapt the remap window to this mask
   const samp=[];for(let i=3;i<d.length;i+=64)samp.push(d[i]/255);samp.sort((a,b)=>a-b);
   const p92=samp.length?samp[Math.floor(samp.length*0.92)]:1;
-  const lo=Math.max(0.60,Math.min(0.90,p92-0.08)),hi=Math.min(0.99,lo+0.08);
+  const lo=Math.max(0.20,Math.min(0.30,p92-0.45)),hi=Math.min(0.80,lo+0.35);
   for(let i=3;i<d.length;i+=4){let a=d[i]/255;let t=(a-lo)/(hi-lo);t=t<0?0:t>1?1:t;t=t*t*(3-2*t);d[i]=Math.round(t*255)}
   // dominant colour of the solid core -> dominant hue
   const core=[];for(let i=0;i<d.length;i+=4*7){if(d[i+3]>230)core.push([d[i],d[i+1],d[i+2]])}
@@ -368,8 +371,17 @@ function cleanCutout(img){
   for(let s=0;s<sw*sh;s++)if(bg[s]&&!border.has(lab[s]))keep[s]=1; // fill holes
   lab.fill(0);comp=0;sizes.length=0;sizes.push(0);
   labelGrid(keep,1);
-  if(comp>1){let best=1,bs=0;for(let k=1;k<=comp;k++)if(sizes[k]>bs){bs=sizes[k];best=k}
-    for(let s=0;s<sw*sh;s++)if(keep[s]&&lab[s]!==best)keep[s]=0}
+  if(comp>1){
+    let best=1,bs=0;for(let k=1;k<=comp;k++)if(sizes[k]>bs){bs=sizes[k];best=k}
+    // bounding box of each component on the small grid, to judge closeness
+    const bb=[];for(let k=0;k<=comp;k++)bb.push([sw,sh,-1,-1]);
+    for(let s=0;s<sw*sh;s++){const k=lab[s];if(!k)continue;const px=s%sw,py=(s/sw)|0;
+      if(px<bb[k][0])bb[k][0]=px;if(py<bb[k][1])bb[k][1]=py;if(px>bb[k][2])bb[k][2]=px;if(py>bb[k][3])bb[k][3]=py}
+    const B=bb[best];
+    for(let s=0;s<sw*sh;s++){if(!keep[s])continue;const k=lab[s];if(k===best)continue;
+      const b=bb[k],gap=Math.max(0,B[0]-b[2],b[0]-B[2],B[1]-b[3],b[1]-B[3]);
+      if(!(sizes[k]>=bs*0.08||gap<=3))keep[s]=0}
+  }
   for(let y=0;y<h;y++)for(let xx=0;xx<w;xx++){const cx=Math.min(sw-1,(xx*sw/w)|0),cy=Math.min(sh-1,(y*sh/h)|0);if(!keep[cy*sw+cx])d[(y*w+xx)*4+3]=0}
   const al=new Float32Array(w*h);for(let i=0;i<w*h;i++)al[i]=d[i*4+3];
   const tmp=new Float32Array(w*h);

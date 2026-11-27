@@ -1,0 +1,6 @@
+# Secrets — never commit
+.env
+.dev.vars
+# Local dev database (recreated automatically; Supabase is used in production)
+data/*.db
+data/*.db-journal
