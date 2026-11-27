@@ -23,7 +23,8 @@ function validateImageRequest(body) {
   const seedRaw = body?.seed === undefined || body?.seed === null ? Math.floor(Math.random() * 1e9) : Number(body.seed);
   return {
     prompt,
-    // Accepted for the API shape; FLUX itself only takes prompt/steps/seed
+    // Accepted for the API shape; FLUX itself only takes prompt and steps
+    // (seed is never forwarded — the model rejects it with a 400)
     // and returns 1024x1024 — the page cover-crops it to the chosen ad size.
     width: Math.min(2048, Math.max(256, Math.round(width))),
     height: Math.min(2048, Math.max(256, Math.round(height))),
@@ -34,12 +35,12 @@ function validateImageRequest(body) {
 // Call Cloudflare Workers AI. Returns { bytes: Buffer, contentType }.
 // The REST API answers with a JSON envelope { result: { image: "<base64>" } };
 // a raw binary image response is tolerated too.
-async function generateImageCF({ prompt, seed }) {
+async function generateImageCF({ prompt }) {
   const url = `${CF_API_BASE}/accounts/${CF_ACCOUNT_ID}/ai/run/${CF_MODEL}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { Authorization: `Bearer ${CF_API_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, steps: 4, seed }),
+    body: JSON.stringify({ prompt, steps: 4 }),
   });
   const ct = res.headers.get("content-type") || "";
   if (ct.includes("image/")) {
