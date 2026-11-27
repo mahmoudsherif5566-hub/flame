@@ -233,7 +233,7 @@ function pollinationsURL(prompt,w,h,seed){return `https://image.pollinations.ai/
 function adPrompt(name,desc,forBackground){
   const base=`${name}${desc?`, ${desc}`:''}, ${STYLE_EN[style]||STYLE_EN['استوديو']}, photorealistic, high detail, commercial advertising quality, no text, no words, no letters, no watermark, no logo`;
   if(forBackground) return `Empty ${STYLE_EN[style]||STYLE_EN['استوديو']} scene background, subject area in the upper half, generous empty space in the lower third, no product, no people, ${size.label==='بانر 16:9'?'wide horizontal composition':'centered composition'}, photorealistic, no text, no watermark`;
-  return `Professional advertising photo of ${base}, ${size.label==='بانر 16:9'?'wide horizontal composition, product on the right side, empty space on the left for text':'product positioned in the upper half of the frame, generous empty space in the lower third for text'}, photorealistic, high detail, commercial advertising quality, no text, no words, no letters, no watermark, no logo`;
+  return `Professional advertising photo of ${base}, only the product itself, single product centered and isolated, no people, no person, no human, no hands, no animals, no frame, no border, no decorative elements, ${size.label==='بانر 16:9'?'wide horizontal composition, product on the right side, empty space on the left for text':'product positioned in the upper half of the frame, generous empty space in the lower third for text'}, photorealistic, high detail, commercial advertising quality, no text, no words, no letters, no watermark, no logo`;
 }
 /* Text lives ONLY in its own zone — never on top of the product.
    'bottom' (square/story): product zone = top ~62%, text panel = bottom.
