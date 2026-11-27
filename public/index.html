@@ -6,59 +6,69 @@
 <title>Flame — استوديو إعلانات بالذكاء الاصطناعي</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#000;color:#f5f0e8;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh}
+  html{scroll-behavior:smooth}
+  ::selection{background:rgba(255,106,0,.35)}
+  body{background:radial-gradient(1200px 620px at 50% -10%,rgba(255,106,0,.09),transparent 60%),#000;color:#f5f0e8;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
   a{color:#ffb25e}
-  header{position:sticky;top:0;z-index:10;background:rgba(0,0,0,.8);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-  .logo{font-size:26px;font-weight:900;letter-spacing:1px;background:linear-gradient(90deg,#ffb25e,#ff6a00);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .pill{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:7px 14px;font-size:13px;background:rgba(255,255,255,.05)}
+  header{position:sticky;top:0;z-index:10;background:rgba(0,0,0,.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .logo{font-size:24px;font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#ffb25e,#ff6a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pill{border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:8px 15px;font-size:13px;background:rgba(255,255,255,.05)}
   .pill b{color:#ffb25e}
-  main{max-width:980px;margin:0 auto;padding:18px 14px 60px}
-  h1{font-size:30px;margin:18px 0 6px}
-  .sub{color:#b8a99a;margin-bottom:18px;line-height:1.7}
-  section{margin:26px 0}
-  h2{font-size:20px;margin-bottom:12px}
-  .glass{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;backdrop-filter:blur(16px);padding:18px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
-  .slider{position:relative;overflow:hidden;border-radius:18px}
-  .track{display:flex;transition:transform .35s ease}
+  main{max-width:980px;margin:0 auto;padding:24px 16px 96px}
+  h1{font-size:36px;font-weight:800;letter-spacing:-.5px;line-height:1.25;margin:22px 0 8px}
+  .sub{color:#b8a99a;margin-bottom:20px;line-height:1.8;font-size:17px}
+  section{margin:40px 0}
+  h2{font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:14px}
+  .glass{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);border-radius:24px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+  .slider{position:relative;overflow:hidden;border-radius:22px;box-shadow:0 16px 48px rgba(0,0,0,.45)}
+  .track{display:flex;transition:transform .4s cubic-bezier(.22,.61,.36,1)}
   .slide{min-width:100%;cursor:pointer}
   .slide img{width:100%;height:340px;object-fit:cover;display:block}
-  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-  .nav button{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:50%;width:42px;height:42px;font-size:18px;cursor:pointer}
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+  .nav button{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:50%;width:42px;height:42px;font-size:18px;cursor:pointer;transition:background .2s ease,transform .2s ease}
+  .nav button:hover{background:rgba(255,255,255,.15);transform:scale(1.05)}
   .dots{display:flex;gap:6px}
-  .dots span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer}
+  .dots span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .25s ease}
   .dots span.on{background:#ff6a00;width:22px;border-radius:99px}
-  .ba{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .ba figure{border-radius:16px;overflow:hidden;position:relative;background:#222}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .ba figure{border-radius:18px;overflow:hidden;position:relative;background:#222;box-shadow:0 12px 32px rgba(0,0,0,.4)}
   .ba img{width:100%;height:260px;object-fit:cover;display:block}
   .ba figcaption{position:absolute;top:10px;right:10px;background:#ff6a00;color:#fff;font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px}
-  input,select,textarea{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:12px;padding:12px;margin:6px 0;font-size:15px;font-family:inherit}
-  button.cta{background:linear-gradient(90deg,#ffb25e,#ff6a00);color:#fff;border:none;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%;margin-top:8px}
+  input,select,textarea{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:14px;padding:13px 14px;margin:7px 0;font-size:15px;font-family:inherit;transition:border-color .2s ease,box-shadow .2s ease}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:rgba(255,178,94,.7);box-shadow:0 0 0 3px rgba(255,106,0,.18)}
+  button.cta{background:linear-gradient(90deg,#ffb25e,#ff6a00);color:#fff;border:none;border-radius:14px;padding:14px 24px;font-size:16px;font-weight:800;cursor:pointer;width:100%;margin-top:10px;box-shadow:0 10px 28px rgba(255,106,0,.35);transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease}
+  button.cta:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 14px 34px rgba(255,106,0,.45)}
   button.cta:disabled{opacity:.5;cursor:not-allowed}
-  button.ghost{background:rgba(255,255,255,.08);color:#ffb25e;border:1px solid rgba(255,178,94,.5);border-radius:12px;padding:11px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-  .chip{border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:8px 14px;cursor:pointer;font-size:14px}
-  .chip.on{background:#ff6a00;border-color:#ff6a00}
+  button.ghost{background:rgba(255,255,255,.08);color:#ffb25e;border:1px solid rgba(255,178,94,.5);border-radius:14px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%;margin-top:10px;transition:background .2s ease,transform .2s ease}
+  button.ghost:hover{background:rgba(255,255,255,.13);transform:translateY(-1px)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .chip{border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:9px 15px;cursor:pointer;font-size:14px;transition:all .2s ease}
+  .chip:hover{border-color:rgba(255,178,94,.7)}
+  .chip.on{background:#ff6a00;border-color:#ff6a00;box-shadow:0 6px 18px rgba(255,106,0,.35)}
   .locked{opacity:.55}
-  .note{font-size:13px;color:#b8a99a;line-height:1.7;margin-top:10px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:640px){.grid2,.ba{grid-template-columns:1fr}.slide img{height:260px}}
-  .plan{border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:16px}
-  .plan.pro{border-color:#ff6a00;box-shadow:0 0 0 1px #ff6a00}
-  .price{font-size:30px;font-weight:900;margin:8px 0}
-  .price small{font-size:14px;color:#b8a99a}
-  .plan ul{list-style:none;line-height:2;color:#e8ddd0}
+  .note{font-size:13px;color:#b8a99a;line-height:1.8;margin-top:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:640px){.grid2,.ba{grid-template-columns:1fr}.slide img{height:260px}h1{font-size:30px}.glass{padding:20px}}
+  .plan{border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:22px;transition:transform .2s ease,box-shadow .2s ease}
+  .plan:hover{transform:translateY(-2px)}
+  .plan.pro{border-color:#ff6a00;box-shadow:0 0 0 1px #ff6a00,0 16px 40px rgba(255,106,0,.14)}
+  .price{font-size:32px;font-weight:900;margin:10px 0;letter-spacing:-.5px}
+  .price small{font-size:14px;color:#b8a99a;font-weight:400}
+  .plan ul{list-style:none;line-height:2.1;color:#e8ddd0}
   .plan li::before{content:"✓ ";color:#ffb25e}
-  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .gitem{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;font-size:13px;line-height:1.6}
-  .toast{position:fixed;bottom:18px;right:50%;transform:translateX(50%);background:#ff6a00;color:#fff;padding:12px 20px;border-radius:99px;font-weight:700;z-index:50;display:none;max-width:90vw;text-align:center}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .gitem{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px;font-size:13px;line-height:1.7}
+  /* Toast sits under the sticky header at the TOP of the viewport so it can
+     never cover the footer note or the "Powered by Netlify" badge at the bottom. */
+  .toast{position:fixed;top:78px;right:50%;transform:translateX(50%);background:rgba(255,106,0,.96);color:#fff;padding:12px 22px;border-radius:99px;font-weight:700;z-index:50;display:none;max-width:90vw;text-align:center;box-shadow:0 12px 32px rgba(0,0,0,.5);backdrop-filter:blur(8px)}
   .stat{display:flex;gap:12px;flex-wrap:wrap}
-  .stat div{flex:1;min-width:110px;background:rgba(255,255,255,.05);border-radius:14px;padding:12px;text-align:center}
-  .stat b{font-size:24px;color:#ffb25e;display:block}
-  .status{font-size:14px;color:#ffb25e;line-height:1.8;min-height:22px;margin-top:10px}
-  .result img{width:100%;border-radius:14px;margin-top:8px;display:block}
-  .check{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:15px;cursor:pointer}
+  .stat div{flex:1;min-width:110px;background:rgba(255,255,255,.05);border-radius:16px;padding:16px 12px;text-align:center}
+  .stat b{font-size:26px;color:#ffb25e;display:block;letter-spacing:-.5px}
+  .status{font-size:14px;color:#ffb25e;line-height:1.8;min-height:22px;margin-top:12px}
+  .result img{width:100%;border-radius:16px;margin-top:10px;display:block;box-shadow:0 16px 48px rgba(0,0,0,.45)}
+  .check{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:15px;cursor:pointer}
   .check input{width:auto;margin:0;accent-color:#ff6a00}
-  .lbl{font-size:14px;color:#b8a99a;margin-top:12px}
+  .lbl{font-size:14px;color:#b8a99a;margin-top:14px}
 </style>
 </head>
 <body>
